@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum CardStatus { incorrect, correct, misplaced, unselected }
 
@@ -25,13 +26,24 @@ class SingleBox extends StatelessWidget {
 
   Widget _setWidget() {
     if (isActive) {
-      return TextFormField(
-        initialValue: '',
-        autofocus: true,
-        onChanged: (val) {
-          debugPrint('in on changed ----------------');
-          callBackFunction(val);
+      return RawKeyboardListener(
+        focusNode: FocusNode(),
+        onKey: (event) {
+          debugPrint('${event.logicalKey.keyLabel}');
+          if (event.runtimeType.toString() == 'RawKeyDownEvent') {
+            if (event.logicalKey == LogicalKeyboardKey.backspace) {
+              callBackFunction('DELETE');
+            }
+          }
         },
+        child: TextFormField(
+          initialValue: '',
+          autofocus: true,
+          onChanged: (val) {
+            debugPrint('in on changed ----------------');
+            callBackFunction(val.toUpperCase());
+          },
+        ),
       );
     } else {
       return Text(
@@ -46,7 +58,7 @@ class SingleBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('Box Called: $cardStatus');
+    //debugPrint('Box Called: $cardStatus');
     return Container(
       width: 100,
       height: 100,
